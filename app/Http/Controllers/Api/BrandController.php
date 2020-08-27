@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Brand;
+use App\Http\Resources\BrandResource;
 
 class BrandController extends Controller
 {
@@ -17,7 +18,7 @@ class BrandController extends Controller
     {
         //
         $brands = Brand::all();
-        return $brands;
+        return BrandResource::collection($brands);
     }
 
     /**
@@ -37,9 +38,10 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Brand $brand)
     {
         //
+        return new BrandResource($brand);
     }
 
     /**

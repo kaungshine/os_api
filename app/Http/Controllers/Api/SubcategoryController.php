@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Subcategory;
+use App\Http\Resources\SubcategoryResource;
 
 class SubcategoryController extends Controller
 {
@@ -17,7 +18,7 @@ class SubcategoryController extends Controller
     {
         //
         $subcategories = Subcategory::all();
-        return $subcategories;
+        return SubcategoryResource::collection($subcategories);
     }
 
     /**
@@ -40,7 +41,7 @@ class SubcategoryController extends Controller
     public function show(Subcategory $subcategory)
     {
         //
-        return $subcategory;
+        return new SubcategoryResource($subcategory);
     }
 
     /**
