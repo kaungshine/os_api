@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Item;
 use Illuminate\Http\Request;
 use App\Http\Resources\ItemResource;
+use App\Brand;
+use App\Subcategory;
 
 class ItemController extends Controller
 {
     public function __construct($value='')
     {
-        $this->middleware('auth:api')->except('index');
+        $this->middleware('auth:api')->except('index', 'filter');
     }
     /**
      * Display a listing of the resource.
@@ -104,5 +106,49 @@ class ItemController extends Controller
     public function destroy(Item $item)
     {
         //
+    }
+
+    // public function filter($sid,$bid)
+    // {
+    //     $items = array();
+    //     if ($sid && $bid) {
+    //         $items = Item::where('subcategory_id',$sid)
+    //         ->where('brand_id', $bid)
+    //         ->get();
+
+    //     }else{
+    //         $items = Item::where('subcategory_id',$sid)
+    //         ->or_where('brand_id', $bid)
+    //         ->get(); 
+    //     }
+    //     return $items;
+    // }
+
+    public function filter(Request $request)
+    {
+        $query = $request->query();
+        $items = Item::all();
+        $results = collect([]);
+        
+        foreach ($query as $key => $value) {
+            if($key == "subcategory")
+            {
+                $subcategory = Subcategory::where('name', 'Like', '%' . $value . '%')->get();
+                if(count($subcategory) > 0)
+                    $results = $items->where('subcategory_id', $subcategory[0]->id);
+            }
+            elseif($key == "brand")
+            {
+                $brand = Brand::where('name', 'Like', '%' . $value . '%')->get();
+                if(count($brand) > 0)
+                    $results = $items->where('brand_id', $brand[0]->id);
+            }
+        }
+
+        return response()->json([
+                "status" => "ok",
+                "totalResults" => count($results),
+                "items" => ItemResource::collection($results),
+        ]);
     }
 }
